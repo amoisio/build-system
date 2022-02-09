@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  tc:
+    container_name: tc
+    image: jetbrains/teamcity-server:2021.2.2
+    ports:
+      - 5000:8111
+    volumes:
+      - /data/teamcity/datadir:/data/teamcity_server/datadir
+      - /opt/teamcity/logs:/opt/teamcity/logs
+  tc-agent1:
+    container_name: tc-agent1
+    image: jetbrains/teamcity-agent:2021.2.2
+    links:
+      - tc:teamcity
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/buildagent/work:/opt/buildagent/work
+      - /opt/buildagent/temp:/opt/buildagent/temp
+      - /data/teamcity-agents/agent1/conf:/data/teamcity_agent/conf
+    environment:
+      - SERVER_URL=teamcity:8111
+      - DOCKER_IN_DOCKER=start
+    user: root
+    privileged: true
+    
